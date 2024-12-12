@@ -9,6 +9,37 @@ import { Address,NFTCard ,Connector,ConnectButton,useAccount} from "@ant-design/
 import { useEffect, useState } from 'react';
 import { userAgent } from "next/server";
 
+const CallEvent = () => {
+  useWatchContractEvent({
+    address: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9",
+    abi: [
+      {
+        anonymous: false,
+        type: "event",
+        name: "Minted",
+        inputs: [
+          {
+            indexed: false,
+            internalType: "address",
+            name: "minter",
+            type: "address",
+          },
+          {
+            indexed: false,
+            internalType: "uint256",
+            name: "amount",
+            type: "uint256",
+          }
+        ]
+      }
+    ],
+    eventName: "Minted",
+    onLogs: (logs) => {
+      message.success(`${logs[0].args.minter} minted ${logs[0].args.amount} tokens`);
+    } 
+  });
+}
+
 const CallWrite = () => {
   const {writeContract} = useWriteContract();
 
@@ -67,34 +98,7 @@ const CallTest = () => {
 export default function Home() {
   const [hasMetaMask, setHasMetaMask] = useState<boolean>(false);
 
-  useWatchContractEvent({
-    address: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9",
-    abi: [
-      {
-        anonymous: false,
-        type: "event",
-        name: "Minted",
-        inputs: [
-          {
-            indexed: false,
-            internalType: "address",
-            name: "minter",
-            type: "address",
-          },
-          {
-            indexed: false,
-            internalType: "uint256",
-            name: "amount",
-            type: "uint256",
-          }
-        ]
-      }
-    ],
-    eventName: "Minted",
-    onLogs: (logs) => {
-      message.success(`${logs[0].args.minter} minted ${logs[0].args.amount} tokens`);
-    } 
-  });
+
 
   useEffect(() => {
     // 检查是否存在 MetaMask
@@ -141,6 +145,7 @@ export default function Home() {
       </Connector>
       <CallTest />
       <CallWrite />
+      <CallEvent /> 
     </WagmiWeb3ConfigProvider>
   )
 }
